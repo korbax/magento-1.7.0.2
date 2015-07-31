@@ -23,7 +23,19 @@
             <psd2html_separatecart>
                 <class>Psd2Html_SeparateCart_Model</class>
             </psd2html_separatecart>
+            <core>
+                <rewrite>
+                    <url>Psd2Html_SeparateCart_Model_Core_Url</url>
+                </rewrite>
+            </core>
         </models>
+
+        <rewrite>
+            <psd2html_separatecart_checkout_cart>
+                <from><![CDATA[#^/checkout/fht#]]></from>
+                <to>/checkout/cart</to>
+            </psd2html_separatecart_checkout_cart>
+        </rewrite>
 
         <events>
             <catalog_product_load_after>
@@ -76,15 +88,35 @@
                 </observers>
             </sales_order_place_before>
 
-            <!--<controller_action_predispatch>-->
+            <controller_action_predispatch>
+                <observers>
+                    <psd2html_separatecart_controller_action_after>
+                        <type>singleton</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>loadPage</method>
+                    </psd2html_separatecart_controller_action_after>
+                </observers>
+            </controller_action_predispatch>
+
+            <!--<checkout_cart_save_before>-->
                 <!--<observers>-->
-                    <!--<controller_action_after>-->
+                    <!--<psd2html_separatecart_checkout_cart_save_before>-->
                         <!--<type>singleton</type>-->
-                        <!--<class>Psd2Html_Autopopulate_Model_Observer</class>-->
-                        <!--<method>addEvent</method>-->
-                    <!--</controller_action_after>-->
+                        <!--<class>Psd2Html_SeparateCart_Model_Observer</class>-->
+                        <!--<method>cartSaveBefore</method>-->
+                    <!--</psd2html_separatecart_checkout_cart_save_before>-->
                 <!--</observers>-->
-            <!--</controller_action_predispatch>-->
+            <!--</checkout_cart_save_before>-->
+
+            <controller_action_predispatch_checkout_cart_updatePost>
+                <observers>
+                    <psd2html_separatecart_controller_action_predispatch_checkout_cart_updatePost>
+                        <type>singleton</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>cartUpdate</method>
+                    </psd2html_separatecart_controller_action_predispatch_checkout_cart_updatePost>
+                </observers>
+            </controller_action_predispatch_checkout_cart_updatePost>
 
             <!--<before_checkout_cart_add_fht>-->
                 <!--<observers>-->

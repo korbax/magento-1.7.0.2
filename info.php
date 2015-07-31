@@ -30,26 +30,41 @@ foreach ($quote_items as $item) {
 }
 //Mage::getSingleton('core/session')->setSessionItemsCart($data);
 //Mage::getSingleton('core/session')->setSessionItemsCart();
-//print '-------------------------------------------';
-//Zend_Debug::dump($data);
-//print '===========================================';
+print '-------------------------------------------';
+Zend_Debug::dump($data);
+print '===========================================';
 ////Zend_Debug::dump(Mage::getSingleton('core/session')->getSessionItemsCart());
 $items = Mage::getSingleton('core/session')->getSessionItemsCart();
 foreach($items as $item){
 
-//    Zend_Debug::dump($item);
+    Zend_Debug::dump($item);
 
     $_product = Mage::getModel('catalog/product')->load($item['product_id']);
+    $item1 = $_product;
+    $additionalOptions = array();
+    $additionalOptions[] = array(
+        'label' => 'Type cart',
+        'value' => $item['value']
+    );
+    $item1->addCustomOption('additional_options', serialize($additionalOptions));
+    $opts = $item1->getData('additional_options');
+
+
+
     $cart = Mage::getModel('checkout/cart');
     $cart->init();
     $params = array(
         'product' => 1,
         'product_id' => 1,
         'qty' => $item['qty'],
+//        'additional_options' => array(
+//            'label' => 'Type cart',
+//            'value' => $item['value']
+//        ),
 //        'options' => array(
-//            12345 => array(
-//                'quote_path' => $image,
-//                'secret_key' => substr(md5(file_get_contents(Mage::getBaseDir() . $image)), 0, 20)),
+//            'additional_options' => array(
+//                'label' => 'Type cart',
+//                'value' => $item['value']),
 //        )
     );
     $request = new Varien_Object();
@@ -58,15 +73,12 @@ foreach($items as $item){
     $cart->addProduct($_product, $request);
     $cart->save();
 
+//    Mage::dispatchEvent('catalog_product_load_after', array());
+
 
 //    $cart->getItems()->clear();
 //    $cart->getItems()->setQuote($cart->getQuote());
     Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
-
-//    Mage::getSingleton('core/session', array('name' => 'frontend'));
-//    $cProd = Mage::getModel('catalog/product');
-////    $id = $cProd->getIdBySku("$sku");
-//    header('Location: '. Mage::getUrl('checkout/cart/add', array('product' => $item['product_id'])));
 }
 
 
