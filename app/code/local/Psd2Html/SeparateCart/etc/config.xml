@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Psd2Html_SeparateCart>
+            <version>0.1.1</version>
+        </Psd2Html_SeparateCart>
+    </modules>
+
+    <global>
+        <helpers>
+            <psd2html_separatecart>
+                <class>Psd2Html_SeparateCart_Helper</class>
+            </psd2html_separatecart>
+        </helpers>
+
+        <blocks>
+            <separatecart>
+                <class>Psd2Html_SeparateCart_Block</class>
+            </separatecart>
+        </blocks>
+
+        <models>
+            <psd2html_separatecart>
+                <class>Psd2Html_SeparateCart_Model</class>
+            </psd2html_separatecart>
+        </models>
+
+        <events>
+            <catalog_product_load_after>
+                <observers>
+                    <psd2html_separatecart_model_observer>
+                        <type>model</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>addPostData</method>
+                    </psd2html_separatecart_model_observer>
+                </observers>
+            </catalog_product_load_after>
+
+            <sales_convert_quote_item_to_order_item>
+                <observers>
+                    <psd2html_separatecart_model_observer_order_item>
+                        <type>model</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>salesConvertQuoteItemToOrderItem</method>
+                    </psd2html_separatecart_model_observer_order_item>
+                </observers>
+            </sales_convert_quote_item_to_order_item>
+
+            <sales_quote_item_set_product>
+                <observers>
+                    <psd2html_separatecart_model_observer_set_product>
+                        <type>model</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>updateItem</method>
+                    </psd2html_separatecart_model_observer_set_product>
+                </observers>
+            </sales_quote_item_set_product>
+
+            <sales_quote_collect_totals_before>
+                <observers>
+                    <hackathon_presentation>
+                        <type>singleton</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>salesQuoteAddressCollectTotalsBefore</method>
+                    </hackathon_presentation>
+                </observers>
+            </sales_quote_collect_totals_before>
+
+            <sales_order_place_before>
+                <observers>
+                    <psd2html_separatecart_copy_items_before_create_order>
+                        <type>singleton</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>copyItemsBeforeCreateOrder</method>
+                    </psd2html_separatecart_copy_items_before_create_order>
+                </observers>
+            </sales_order_place_before>
+
+            <!--<controller_action_predispatch>-->
+                <!--<observers>-->
+                    <!--<controller_action_after>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>Psd2Html_Autopopulate_Model_Observer</class>-->
+                        <!--<method>addEvent</method>-->
+                    <!--</controller_action_after>-->
+                <!--</observers>-->
+            <!--</controller_action_predispatch>-->
+
+            <!--<before_checkout_cart_add_fht>-->
+                <!--<observers>-->
+                    <!--<psd2html_auto_extra_options>-->
+                        <!--<type>model</type>-->
+                        <!--<class>Psd2Html_Autopopulate_Model_Observer</class>-->
+                        <!--<method>addPostData</method>-->
+                    <!--</psd2html_auto_extra_options>-->
+                <!--</observers>-->
+            <!--</before_checkout_cart_add_fht>-->
+
+            <!--<catalog_product_load_after>-->
+                <!--<observers>-->
+                    <!--<psd2html_auto_extra_options>-->
+                        <!--<type>model</type>-->
+                        <!--<class>Psd2Html_Autopopulate_Model_Observer</class>-->
+                        <!--<method>catalogProductLoadAfter</method>-->
+                    <!--</psd2html_auto_extra_options>-->
+                <!--</observers>-->
+            <!--</catalog_product_load_after>-->
+
+            <!--<sales_convert_quote_item_to_order_item>-->
+                <!--<observers>-->
+                    <!--<psd2html_auto_sales_item>-->
+                        <!--<type>model</type>-->
+                        <!--<class>Psd2Html_Autopopulate_Model_Observer</class>-->
+                        <!--<method>salesConvertQuoteItemToOrderItem</method>-->
+                    <!--</psd2html_auto_sales_item>-->
+                <!--</observers>-->
+            <!--</sales_convert_quote_item_to_order_item>-->
+        </events>
+    </global>
+
+    <frontend>
+        <routers>
+            <separatecart>
+                <use>standard</use>
+                <args>
+                    <module>Psd2Html_SeparateCart</module>
+                    <frontName>separatecart</frontName>
+                </args>
+            </separatecart>
+        </routers>
+        <layout>
+            <updates>
+                <sitemap>
+                    <file>psd2html/separatecart.xml</file>
+                </sitemap>
+            </updates>
+        </layout>
+    </frontend>
+</config>
