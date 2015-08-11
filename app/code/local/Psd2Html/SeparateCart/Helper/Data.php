@@ -45,13 +45,15 @@ class Psd2Html_SeparateCart_Helper_Data extends Mage_Core_Helper_Abstract
     public function getCountSimple()
     {
         $this->getCalculateProduct();
-        return  $this->__('My Cart (%s item)', $this->count_simple);
+        if($this->count_simple) return  $this->__('My Cart (%s item)', $this->count_simple);
+        return  $this->__('My Cart');
     }
 
     public function getCountFHT()
     {
         $this->getCalculateProduct();
-        return  $this->__('My FHT (%s item)', $this->count_fht);
+        if($this->count_fht) return  $this->__('My FHT (%s item)', $this->count_fht);
+        return  $this->__('My FHT');
     }
 }
 

@@ -58,16 +58,6 @@
                 </observers>
             </sales_convert_quote_item_to_order_item>
 
-            <sales_quote_item_set_product>
-                <observers>
-                    <psd2html_separatecart_model_observer_set_product>
-                        <type>model</type>
-                        <class>Psd2Html_SeparateCart_Model_Observer</class>
-                        <method>updateItem</method>
-                    </psd2html_separatecart_model_observer_set_product>
-                </observers>
-            </sales_quote_item_set_product>
-
             <sales_quote_collect_totals_before>
                 <observers>
                     <hackathon_presentation>
@@ -88,7 +78,6 @@
                 </observers>
             </sales_order_place_before>
 
-            <!--Comment for add product to cart-->
             <controller_action_predispatch>
                 <observers>
                     <psd2html_separatecart_controller_action_after>
@@ -98,7 +87,26 @@
                     </psd2html_separatecart_controller_action_after>
                 </observers>
             </controller_action_predispatch>
-            <!--======================-->
+
+            <!--<load_checkout_onepage>-->
+                <!--<observers>-->
+                    <!--<psd2html_separatecart_onepage_observer>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>Psd2Html_SeparateCart_Model_Observer</class>-->
+                        <!--<method>beforeCreateOrder</method>-->
+                    <!--</psd2html_separatecart_onepage_observer>-->
+                <!--</observers>-->
+            <!--</load_checkout_onepage>-->
+
+            <!--<controller_action_predispatch>-->
+                <!--<observers>-->
+                    <!--<psd2html_separatecart_controller_action_after>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>Psd2Html_SeparateCart_Model_Observer</class>-->
+                        <!--<method>addEvent</method>-->
+                    <!--</psd2html_separatecart_controller_action_after>-->
+                <!--</observers>-->
+            <!--</controller_action_predispatch>-->
 
             <!--<checkout_cart_save_before>-->
                 <!--<observers>-->
@@ -109,36 +117,6 @@
                     <!--</psd2html_separatecart_checkout_cart_save_before>-->
                 <!--</observers>-->
             <!--</checkout_cart_save_before>-->
-
-            <controller_action_predispatch_checkout_cart_updatePost>
-                <observers>
-                    <psd2html_separatecart_controller_action_predispatch_checkout_cart_updatePost>
-                        <type>singleton</type>
-                        <class>Psd2Html_SeparateCart_Model_Observer</class>
-                        <method>cartUpdate</method>
-                    </psd2html_separatecart_controller_action_predispatch_checkout_cart_updatePost>
-                </observers>
-            </controller_action_predispatch_checkout_cart_updatePost>
-
-            <!--<before_checkout_cart_add_fht>-->
-                <!--<observers>-->
-                    <!--<psd2html_auto_extra_options>-->
-                        <!--<type>model</type>-->
-                        <!--<class>Psd2Html_Autopopulate_Model_Observer</class>-->
-                        <!--<method>addPostData</method>-->
-                    <!--</psd2html_auto_extra_options>-->
-                <!--</observers>-->
-            <!--</before_checkout_cart_add_fht>-->
-
-            <!--<catalog_product_load_after>-->
-                <!--<observers>-->
-                    <!--<psd2html_auto_extra_options>-->
-                        <!--<type>model</type>-->
-                        <!--<class>Psd2Html_Autopopulate_Model_Observer</class>-->
-                        <!--<method>catalogProductLoadAfter</method>-->
-                    <!--</psd2html_auto_extra_options>-->
-                <!--</observers>-->
-            <!--</catalog_product_load_after>-->
 
             <!--<sales_convert_quote_item_to_order_item>-->
                 <!--<observers>-->
