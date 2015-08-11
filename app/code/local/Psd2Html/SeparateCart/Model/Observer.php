@@ -17,10 +17,8 @@ class Psd2Html_SeparateCart_Model_Observer
         Mage::log('111addPostData');
         $action = Mage::app()->getFrontController()->getAction();
         if (is_object($action) AND $action->getFullActionName() == 'checkout_cart_add') {
-            Mage::log('111addPostData  checkout_cart_add');
             if ($action->getRequest()->getParam('typecart')) {
 
-                Mage::log('addPostData');
                 // ID IS PRESENT, SO LETS ADD IT
                 $item = $observer->getProduct();
                 $additionalOptions = array();
@@ -29,38 +27,20 @@ class Psd2Html_SeparateCart_Model_Observer
                     'value' => $action->getRequest()->getParam('typecart')
                 );
                 $item->addCustomOption('additional_options', serialize($additionalOptions));
-//                Mage::log($item->getData());
-                Mage::log('addPostData----------------------------');
-                $opts = $item->getData('additional_options');
-//                $opts=unserialize($opts);
-                Mage::log($opts);
-
-//                $productOptions = $item->getCustomOption();
             }
         }
-
-
     }
 
     public function loadPage(Varien_Event_Observer $observer)
     {
-        Mage::log('loadPage===');
         $action = $observer->getControllerAction()->getFullActionName();
-        Mage::log($action);
+
         if($action == self::CARTDEFAULT){
-            Mage::log('loadPage=' . self::CARTDEFAULT);
-            print 'SIMPLE';
             $this->updateCart(self::CARTDEFAULTVALUE);
         }
         elseif($action == self::CARTFHT AND self::$status){
-            Mage::log('loadPage=' . self::CARTFHT);
-            print 'FHT';
             $this->updateCart(self::CARTFHTVALUE);
         }
-//        elseif($action == 'checkout_cart_updatePost'){
-//            self::$status = false;
-//            Mage::log('loadPage===' . self::$status);
-//        }
     }
 
     private function updateCart($value)
@@ -71,7 +51,7 @@ class Psd2Html_SeparateCart_Model_Observer
         $sessionItemsCart = Mage::getSingleton('core/session')->getSessionItemsCart();
 //        if(isset($quote_items) AND !isset($sessionItemsCart)) {
         if(isset($quote_items)) {
-            Mage::log('updateItem!!! add to session');
+            Mage::log('updateCart!!! add to session');
 //            Mage::getSingleton('core/session')->setSessionItemsCart();
             foreach ($quote_items as $item) {
                 $additionalOptions = $item->getOptionByCode('additional_options');
@@ -91,40 +71,40 @@ class Psd2Html_SeparateCart_Model_Observer
 
         $items = Mage::getSingleton('core/session')->getSessionItemsCart();
 //        Zend_Debug::dump($items);
-        if(isset($items)){
-            Mage::getSingleton('checkout/session')->clear();
-            Mage::getSingleton('checkout/cart')->truncate();
-            print 'clear';
-            foreach($items as $item){
-                if($item['value'] == $value){
-                    $item1 = $_product = Mage::getModel('catalog/product')->load($item['product_id']);
-                    $additionalOptions = array();
-
-                    $additionalOptions[] = array(
-                        'label' => 'Type cart',
-                        'value' => $value
-                    );
-
-                    Zend_Debug::dump($item);
-
-                    $item1->addCustomOption('additional_options', serialize($additionalOptions));
-
-                    $cart = Mage::getModel('checkout/cart');
-                    $cart->init();
-                    $params = array(
-                        'product' => 1,
-                        'product_id' => 1,
-                        'qty' => $item['qty']
-                    );
-                    $request = new Varien_Object();
-                    $request->setData($params);
-//////    $cart->addProduct($_product, $params);
-                    $cart->addProduct($_product, $request);
-                    $cart->save();
-                    Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
-                }
-            }
-        }
+//        if(isset($items)){
+//            Mage::getSingleton('checkout/session')->clear();
+//            Mage::getSingleton('checkout/cart')->truncate();
+//            print 'clear';
+//            foreach($items as $item){
+//                if($item['value'] == $value){
+//                    $item1 = $_product = Mage::getModel('catalog/product')->load($item['product_id']);
+//                    $additionalOptions = array();
+//
+//                    $additionalOptions[] = array(
+//                        'label' => 'Type cart',
+//                        'value' => $value
+//                    );
+//
+//                    Zend_Debug::dump($item);
+//
+//                    $item1->addCustomOption('additional_options', serialize($additionalOptions));
+//
+//                    $cart = Mage::getModel('checkout/cart');
+//                    $cart->init();
+//                    $params = array(
+//                        'product' => 1,
+//                        'product_id' => 1,
+//                        'qty' => $item['qty']
+//                    );
+//                    $request = new Varien_Object();
+//                    $request->setData($params);
+////////    $cart->addProduct($_product, $params);
+//                    $cart->addProduct($_product, $request);
+//                    $cart->save();
+//                    Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
+//                }
+//            }
+//        }
     }
 
     /**

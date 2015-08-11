@@ -8,9 +8,9 @@
 
     <global>
         <helpers>
-            <psd2html_separatecart>
+            <separatecart>
                 <class>Psd2Html_SeparateCart_Helper</class>
-            </psd2html_separatecart>
+            </separatecart>
         </helpers>
 
         <blocks>
@@ -88,6 +88,7 @@
                 </observers>
             </sales_order_place_before>
 
+            <!--Comment for add product to cart-->
             <controller_action_predispatch>
                 <observers>
                     <psd2html_separatecart_controller_action_after>
@@ -97,6 +98,7 @@
                     </psd2html_separatecart_controller_action_after>
                 </observers>
             </controller_action_predispatch>
+            <!--======================-->
 
             <!--<checkout_cart_save_before>-->
                 <!--<observers>-->
