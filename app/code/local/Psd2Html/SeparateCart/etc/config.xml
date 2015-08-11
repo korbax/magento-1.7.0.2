@@ -88,25 +88,25 @@
                 </observers>
             </controller_action_predispatch>
 
-            <!--<load_checkout_onepage>-->
-                <!--<observers>-->
-                    <!--<psd2html_separatecart_onepage_observer>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>Psd2Html_SeparateCart_Model_Observer</class>-->
-                        <!--<method>beforeCreateOrder</method>-->
-                    <!--</psd2html_separatecart_onepage_observer>-->
-                <!--</observers>-->
-            <!--</load_checkout_onepage>-->
+            <load_checkout_onepage>
+                <observers>
+                    <psd2html_separatecart_onepage_observer>
+                        <type>singleton</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>beforeCreateOrder</method>
+                    </psd2html_separatecart_onepage_observer>
+                </observers>
+            </load_checkout_onepage>
 
-            <!--<controller_action_predispatch>-->
-                <!--<observers>-->
-                    <!--<psd2html_separatecart_controller_action_after>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>Psd2Html_SeparateCart_Model_Observer</class>-->
-                        <!--<method>addEvent</method>-->
-                    <!--</psd2html_separatecart_controller_action_after>-->
-                <!--</observers>-->
-            <!--</controller_action_predispatch>-->
+            <controller_action_predispatch>
+                <observers>
+                    <psd2html_separatecart_controller_action_after>
+                        <type>singleton</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>addEvent</method>
+                    </psd2html_separatecart_controller_action_after>
+                </observers>
+            </controller_action_predispatch>
 
             <!--<checkout_cart_save_before>-->
                 <!--<observers>-->
