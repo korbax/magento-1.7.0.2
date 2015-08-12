@@ -182,7 +182,6 @@ class Psd2Html_SeparateCart_Model_Observer
             Mage::getSingleton('core/session')->setSessionItemsCart($data);
         }
 
-//        Zend_Debug::dump($data);
         if($data){
             foreach($data as $product){
                 if($product['value'] == self::CARTDEFAULTVALUE){
@@ -190,7 +189,6 @@ class Psd2Html_SeparateCart_Model_Observer
                     $items = $cartHelper->getCart()->getItems();
                     foreach($items as $item){
                         if($item->getItemId() == $product['old_item_id']){
-//                        print '<br/>remove=' . $item->getItemId();
                             $cartHelper->getCart()->removeItem($item->getItemId())->save();
                         }
                     }
@@ -281,17 +279,17 @@ class Psd2Html_SeparateCart_Model_Observer
             $event_data_array = array();
             Mage::dispatchEvent('load_checkout_onepage', $event_data_array);
         }
-//        if ($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepagefht_index') {
-//            $event_data_array = array();
-//            Mage::dispatchEvent('load_checkout_onepage_fht', $event_data_array);
-//        }
-        if($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepage_saveOrder'){
-            //checkout/onepage/success/
-//            checkout_onepage_saveOrder
-//            checkout_onepage_success
+        if ($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepagefht_index') {
             $event_data_array = array();
-            Mage::dispatchEvent('after_checkout_onepage_success', $event_data_array);
+            Mage::dispatchEvent('load_checkout_onepage_fht', $event_data_array);
         }
+//        if($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepage_saveOrder'){
+//            //checkout/onepage/success/
+////            checkout_onepage_saveOrder
+////            checkout_onepage_success
+//            $event_data_array = array();
+//            Mage::dispatchEvent('after_checkout_onepage_success', $event_data_array);
+//        }
     }
 
 
