@@ -119,7 +119,6 @@ class Psd2Html_SeparateCart_Model_Observer
         $data = array();
 
         if(isset($quote_items)) {
-            Mage::log('beforeCreateOrder add to session');
             Mage::getSingleton('core/session')->setSessionItemsCart(); //clear session
             foreach ($quote_items as $item) {
                 $additionalOptions = $item->getOptionByCode('additional_options');
@@ -137,15 +136,16 @@ class Psd2Html_SeparateCart_Model_Observer
             Mage::getSingleton('core/session')->setSessionItemsCart($data);
         }
 
-//        Zend_Debug::dump($data);
-        foreach($data as $product){
-            if($product['value'] == self::CARTFHTVALUE){
-                $cartHelper = Mage::helper('checkout/cart');
-                $items = $cartHelper->getCart()->getItems();
-                foreach($items as $item){
-                    if($item->getItemId() == $product['old_item_id']){
+        if($data){
+            foreach($data as $product){
+                if($product['value'] == self::CARTFHTVALUE){
+                    $cartHelper = Mage::helper('checkout/cart');
+                    $items = $cartHelper->getCart()->getItems();
+                    foreach($items as $item){
+                        if($item->getItemId() == $product['old_item_id']){
 //                        print '<br/>remove=' . $item->getItemId();
-                        $cartHelper->getCart()->removeItem($item->getItemId())->save();
+                            $cartHelper->getCart()->removeItem($item->getItemId())->save();
+                        }
                     }
                 }
             }
@@ -210,9 +210,6 @@ class Psd2Html_SeparateCart_Model_Observer
 
         $event = $observer->getEvent();
         $order = $event->getOrder();
-        Mage::log($order->getIncrementId());
-
-
         $incrementId = $order->getIncrementId();
         $order = Mage::getModel('sales/order')->loadByIncrementId($incrementId);
         $optionValue = null;
@@ -230,13 +227,6 @@ class Psd2Html_SeparateCart_Model_Observer
                 }
             }
         }
-        Mage::log($optionValue);
-
-//        $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
-//        Mage::log($orderId);
-//        $orderId = Mage::getSingleton('checkout/session')->getLastOrderId();
-//        Mage::log($orderId);
-//        Zend_Debug::dump($quote_item); exit;
 
         $items = Mage::getSingleton('core/session')->getSessionItemsCart();
         if(isset($items)){
@@ -244,7 +234,6 @@ class Psd2Html_SeparateCart_Model_Observer
             Mage::getSingleton('checkout/cart')->truncate();
             Mage::log('afterCreateOrder before foreach');
             foreach($items as $item){
-//                Zend_Debug::dump($item);
                 if($item['value'] != $optionValue){
                     $_product = Mage::getModel('catalog/product')->load($item['product_id']);
                     $additionalOptions = array();
@@ -262,7 +251,6 @@ class Psd2Html_SeparateCart_Model_Observer
                         );
                     }
 
-
                     $_product->addCustomOption('additional_options', serialize($additionalOptions));
                     $cart = Mage::getModel('checkout/cart');
                     $cart->init();
@@ -274,7 +262,6 @@ class Psd2Html_SeparateCart_Model_Observer
                     $request->setData($params);
                     $cart->addProduct($_product, $request);
                     $cart->save();
-                    Mage::log('afterCreateOrder after save');
                     Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
                 }
             }
