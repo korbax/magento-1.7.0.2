@@ -37,7 +37,7 @@
 <?php if (Mage::helper('separatecart')->isFHTCart() && $this->isPossibleOnepageCheckout()):?>
     <button type="button" title="<?php echo $this->__('Proceed to Checkout') ?>"
             class="button btn-proceed-checkout btn-checkout<?php if ($this->isDisabled()):?> no-checkout<?php endif; ?>"<?php if ($this->isDisabled()):?> disabled="disabled"<?php endif; ?>
-            onclick="window.location='<?php echo $this->getCheckoutUrl() ?>';">
+            onclick="window.location='<?php echo Mage::helper('separatecart')->getCheckoutUrlFHT() ?>';">
         <span>
             <span><?php echo $this->__('Proceed to Checkout FHT') ?></span>
         </span>

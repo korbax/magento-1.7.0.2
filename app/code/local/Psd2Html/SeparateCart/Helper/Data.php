@@ -5,6 +5,7 @@ class Psd2Html_SeparateCart_Helper_Data extends Mage_Core_Helper_Abstract
 
     const TYPE_CART_SIMPLE = 'checkout/cart';
     const TYPE_CART_FHT = 'checkout/fht';
+    const CHECKOUT_URL_FHT = 'checkout/onepagefht';
     private $count_simple = null;
     private $count_fht = null;
 
@@ -54,6 +55,11 @@ class Psd2Html_SeparateCart_Helper_Data extends Mage_Core_Helper_Abstract
         $this->getCalculateProduct();
         if($this->count_fht) return  $this->__('My FHT (%s item)', $this->count_fht);
         return  $this->__('My FHT');
+    }
+
+    public function getCheckoutUrlFHT()
+    {
+        return  Mage::getBaseUrl() . self::CHECKOUT_URL_FHT;
     }
 }
 

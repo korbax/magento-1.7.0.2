@@ -150,7 +150,53 @@ class Psd2Html_SeparateCart_Model_Observer
                 }
             }
         }
+    }
 
+    /**
+     * 1. Save Simple product to session
+     * 2. Remove all product with Simple
+     * @param Varien_Event_Observer $observer
+     */
+    public function beforeCreateOrderFht(Varien_Event_Observer $observer)
+    {
+        Mage::log('beforeCreateOrderFht');
+        $quote = Mage::getModel('checkout/cart')->getQuote();
+        $quote_items = $quote->getItemsCollection();
+        $data = array();
+
+        if(isset($quote_items)) {
+            Mage::getSingleton('core/session')->setSessionItemsCart(); //clear session
+            foreach ($quote_items as $item) {
+                $additionalOptions = $item->getOptionByCode('additional_options');
+                if (isset($additionalOptions)) {
+                    $currentItem = unserialize($additionalOptions->getValue());
+                    $data[] = array(
+                        'product_id' => $additionalOptions['product_id'],
+                        'qty' => $item->getQty(),
+                        'code' => $additionalOptions['code'],
+                        'value' => $currentItem[0]['value'],
+                        'old_item_id' => $additionalOptions['item_id']
+                    );
+                }
+            }
+            Mage::getSingleton('core/session')->setSessionItemsCart($data);
+        }
+
+//        Zend_Debug::dump($data);
+        if($data){
+            foreach($data as $product){
+                if($product['value'] == self::CARTDEFAULTVALUE){
+                    $cartHelper = Mage::helper('checkout/cart');
+                    $items = $cartHelper->getCart()->getItems();
+                    foreach($items as $item){
+                        if($item->getItemId() == $product['old_item_id']){
+//                        print '<br/>remove=' . $item->getItemId();
+                            $cartHelper->getCart()->removeItem($item->getItemId())->save();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -162,6 +208,36 @@ class Psd2Html_SeparateCart_Model_Observer
     {
         Mage::log('afterCreateOrder');
 
+        $event = $observer->getEvent();
+        $order = $event->getOrder();
+        Mage::log($order->getIncrementId());
+
+
+        $incrementId = $order->getIncrementId();
+        $order = Mage::getModel('sales/order')->loadByIncrementId($incrementId);
+        $optionValue = null;
+        foreach ($order->getAllItems() as $item) {
+            $options = $item->getProductOptions();
+            $customOptions = $options['additional_options'];
+            if(!empty($customOptions))
+            {
+                foreach ($customOptions as $option)
+                {
+//                    $optionTitle = $option['label'];
+//                    $optionId = $option['option_id'];
+//                    $optionType = $option['type'];
+                    $optionValue = $option['value'];
+                }
+            }
+        }
+        Mage::log($optionValue);
+
+//        $orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
+//        Mage::log($orderId);
+//        $orderId = Mage::getSingleton('checkout/session')->getLastOrderId();
+//        Mage::log($orderId);
+//        Zend_Debug::dump($quote_item); exit;
+
         $items = Mage::getSingleton('core/session')->getSessionItemsCart();
         if(isset($items)){
             Mage::getSingleton('checkout/session')->clear();
@@ -169,14 +245,23 @@ class Psd2Html_SeparateCart_Model_Observer
             Mage::log('afterCreateOrder before foreach');
             foreach($items as $item){
 //                Zend_Debug::dump($item);
-                if($item['value'] == self::CARTFHTVALUE){
+                if($item['value'] != $optionValue){
                     $_product = Mage::getModel('catalog/product')->load($item['product_id']);
                     $additionalOptions = array();
 
-                    $additionalOptions[] = array(
-                        'label' => 'Type cart',
-                        'value' => self::CARTFHTVALUE
-                    );
+                    if($optionValue == self::CARTFHTVALUE){
+                        $additionalOptions[] = array(
+                            'label' => 'Type cart',
+                            'value' => self::CARTDEFAULTVALUE
+                        );
+                    }
+                    else{
+                        $additionalOptions[] = array(
+                            'label' => 'Type cart',
+                            'value' => self::CARTFHTVALUE
+                        );
+                    }
+
 
                     $_product->addCustomOption('additional_options', serialize($additionalOptions));
                     $cart = Mage::getModel('checkout/cart');
@@ -209,13 +294,17 @@ class Psd2Html_SeparateCart_Model_Observer
             $event_data_array = array();
             Mage::dispatchEvent('load_checkout_onepage', $event_data_array);
         }
-//        if($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepage_saveOrder'){
-//            //checkout/onepage/success/
-////            checkout_onepage_saveOrder
-////            checkout_onepage_success
+//        if ($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepagefht_index') {
 //            $event_data_array = array();
-//            Mage::dispatchEvent('after_checkout_onepage_success', $event_data_array);
+//            Mage::dispatchEvent('load_checkout_onepage_fht', $event_data_array);
 //        }
+        if($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepage_saveOrder'){
+            //checkout/onepage/success/
+//            checkout_onepage_saveOrder
+//            checkout_onepage_success
+            $event_data_array = array();
+            Mage::dispatchEvent('after_checkout_onepage_success', $event_data_array);
+        }
     }
 
 
