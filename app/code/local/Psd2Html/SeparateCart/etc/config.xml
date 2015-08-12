@@ -35,6 +35,11 @@
                 <from><![CDATA[#^/checkout/fht#]]></from>
                 <to>/checkout/cart</to>
             </psd2html_separatecart_checkout_cart>
+
+            <psd2html_separatecart_checkout_onepage>
+                <from><![CDATA[#^/checkout/onepagefht#]]></from>
+                <to>/checkout/onepage</to>
+            </psd2html_separatecart_checkout_onepage>
         </rewrite>
 
         <events>
@@ -68,16 +73,6 @@
                 </observers>
             </sales_quote_collect_totals_before>
 
-            <sales_order_place_before>
-                <observers>
-                    <psd2html_separatecart_copy_items_before_create_order>
-                        <type>singleton</type>
-                        <class>Psd2Html_SeparateCart_Model_Observer</class>
-                        <method>copyItemsBeforeCreateOrder</method>
-                    </psd2html_separatecart_copy_items_before_create_order>
-                </observers>
-            </sales_order_place_before>
-
             <controller_action_predispatch>
                 <observers>
                     <psd2html_separatecart_controller_action_after>
@@ -98,6 +93,28 @@
                 </observers>
             </load_checkout_onepage>
 
+            <!--TEMP-->
+            <!--<load_checkout_onepage>-->
+                <!--<observers>-->
+                    <!--<psd2html_separatecart_onepage_observer>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>Psd2Html_SeparateCart_Model_Observer</class>-->
+                        <!--<method>afterCreateOrder</method>-->
+                    <!--</psd2html_separatecart_onepage_observer>-->
+                <!--</observers>-->
+            <!--</load_checkout_onepage>-->
+            <!--TEMP-->
+
+            <sales_order_place_after>
+                <observers>
+                    <psd2html_separatecart_onepage_observer>
+                        <type>singleton</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>afterCreateOrder</method>
+                    </psd2html_separatecart_onepage_observer>
+                </observers>
+            </sales_order_place_after>
+
             <controller_action_predispatch>
                 <observers>
                     <psd2html_separatecart_controller_action_after>
@@ -107,26 +124,6 @@
                     </psd2html_separatecart_controller_action_after>
                 </observers>
             </controller_action_predispatch>
-
-            <!--<checkout_cart_save_before>-->
-                <!--<observers>-->
-                    <!--<psd2html_separatecart_checkout_cart_save_before>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>Psd2Html_SeparateCart_Model_Observer</class>-->
-                        <!--<method>cartSaveBefore</method>-->
-                    <!--</psd2html_separatecart_checkout_cart_save_before>-->
-                <!--</observers>-->
-            <!--</checkout_cart_save_before>-->
-
-            <!--<sales_convert_quote_item_to_order_item>-->
-                <!--<observers>-->
-                    <!--<psd2html_auto_sales_item>-->
-                        <!--<type>model</type>-->
-                        <!--<class>Psd2Html_Autopopulate_Model_Observer</class>-->
-                        <!--<method>salesConvertQuoteItemToOrderItem</method>-->
-                    <!--</psd2html_auto_sales_item>-->
-                <!--</observers>-->
-            <!--</sales_convert_quote_item_to_order_item>-->
         </events>
     </global>
 

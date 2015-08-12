@@ -57,6 +57,10 @@
         <update handle="checkout_cart_index" />
     </checkout_fht_index>
 
+    <checkout_onepagefht_index>
+        <update handle="checkout_onepage_index" />
+    </checkout_onepagefht_index>
+
     <checkout_onepage_review>
         <reference name="root">
             <!--<action method="addItemRender"><type>simple</type><block>checkout/cart_item_renderer_configurable</block><template>psd2html/separatecart/checkout/item.phtml</template></action>-->

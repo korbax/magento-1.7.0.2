@@ -68,43 +68,6 @@ class Psd2Html_SeparateCart_Model_Observer
             }
             Mage::getSingleton('core/session')->setSessionItemsCart($data);
         }
-
-        $items = Mage::getSingleton('core/session')->getSessionItemsCart();
-//        Zend_Debug::dump($items);
-//        if(isset($items)){
-//            Mage::getSingleton('checkout/session')->clear();
-//            Mage::getSingleton('checkout/cart')->truncate();
-//            print 'clear';
-//            foreach($items as $item){
-//                if($item['value'] == $value){
-//                    $item1 = $_product = Mage::getModel('catalog/product')->load($item['product_id']);
-//                    $additionalOptions = array();
-//
-//                    $additionalOptions[] = array(
-//                        'label' => 'Type cart',
-//                        'value' => $value
-//                    );
-//
-//                    Zend_Debug::dump($item);
-//
-//                    $item1->addCustomOption('additional_options', serialize($additionalOptions));
-//
-//                    $cart = Mage::getModel('checkout/cart');
-//                    $cart->init();
-//                    $params = array(
-//                        'product' => 1,
-//                        'product_id' => 1,
-//                        'qty' => $item['qty']
-//                    );
-//                    $request = new Varien_Object();
-//                    $request->setData($params);
-////////    $cart->addProduct($_product, $params);
-//                    $cart->addProduct($_product, $request);
-//                    $cart->save();
-//                    Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
-//                }
-//            }
-//        }
     }
 
     /**
@@ -151,6 +114,43 @@ class Psd2Html_SeparateCart_Model_Observer
     public function beforeCreateOrder(Varien_Event_Observer $observer)
     {
         Mage::log('beforeCreateOrder');
+        $quote = Mage::getModel('checkout/cart')->getQuote();
+        $quote_items = $quote->getItemsCollection();
+        $data = array();
+
+        if(isset($quote_items)) {
+            Mage::log('beforeCreateOrder add to session');
+            Mage::getSingleton('core/session')->setSessionItemsCart(); //clear session
+            foreach ($quote_items as $item) {
+                $additionalOptions = $item->getOptionByCode('additional_options');
+                if (isset($additionalOptions)) {
+                    $currentItem = unserialize($additionalOptions->getValue());
+                    $data[] = array(
+                        'product_id' => $additionalOptions['product_id'],
+                        'qty' => $item->getQty(),
+                        'code' => $additionalOptions['code'],
+                        'value' => $currentItem[0]['value'],
+                        'old_item_id' => $additionalOptions['item_id']
+                    );
+                }
+            }
+            Mage::getSingleton('core/session')->setSessionItemsCart($data);
+        }
+
+//        Zend_Debug::dump($data);
+        foreach($data as $product){
+            if($product['value'] == self::CARTFHTVALUE){
+                $cartHelper = Mage::helper('checkout/cart');
+                $items = $cartHelper->getCart()->getItems();
+                foreach($items as $item){
+                    if($item->getItemId() == $product['old_item_id']){
+//                        print '<br/>remove=' . $item->getItemId();
+                        $cartHelper->getCart()->removeItem($item->getItemId())->save();
+                    }
+                }
+            }
+        }
+
     }
 
     /**
@@ -161,60 +161,39 @@ class Psd2Html_SeparateCart_Model_Observer
     public function afterCreateOrder(Varien_Event_Observer $observer)
     {
         Mage::log('afterCreateOrder');
-    }
-
-    /**
-     * Save to session items before create order with part items
-     * @param $observer
-     */
-    public function copyItemsBeforeCreateOrder(Varien_Event_Observer $observer)
-    {
-        Mage::log('copyItemsBeforeCreateOrder');
-//        $quote = Mage::getModel('checkout/cart')->getQuote();
-//        $quote_items = $quote->getItemsCollection();
-//        $data = array();
-//        foreach ($quote_items as $item) {
-//
-//            $additionalOptions = $item->getOptionByCode('additional_options');
-//            $currentItem = unserialize($additionalOptions->getValue());
-//            $data[] = array(
-//                'product_id' => $additionalOptions['product_id'],
-//                'qty' => $item->getQty(),
-//                'code' => $additionalOptions['code'],
-//                'value' => $currentItem[0]['value'],
-//                'old_item_id' => $additionalOptions['item_id']
-//            );
-////            Zend_Debug::dump($additionalOptions->getData());
-//        }
-//        Mage::getSingleton('core/session')->setSessionItemsCart($data);
-    }
-
-    /**
-     * Add to cart product from session
-     * @param $observer
-     */
-    public function addProductToCartAfterCreateOrder($observer)
-    {
-        Mage::log('addProductToCartAfterCreateOrder');
-        $qty = 1;
-        $_product = Mage::getModel('catalog/product')->load($id);
-        $cart = Mage::getModel('checkout/cart');
-        $cart->init();
-        $cart->addProduct($_product, array('qty' => $qty));
-
-        $cart->save();
-        Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
-
 
         $items = Mage::getSingleton('core/session')->getSessionItemsCart();
-        foreach($items as $item){
-            $_product = Mage::getModel('catalog/product')->load($item['product_id']);
-            $cart = Mage::getModel('checkout/cart');
-            $cart->init();
-            $cart->addProduct($_product, array('qty' => $item['qty']));
+        if(isset($items)){
+            Mage::getSingleton('checkout/session')->clear();
+            Mage::getSingleton('checkout/cart')->truncate();
+            Mage::log('afterCreateOrder before foreach');
+            foreach($items as $item){
+//                Zend_Debug::dump($item);
+                if($item['value'] == self::CARTFHTVALUE){
+                    $_product = Mage::getModel('catalog/product')->load($item['product_id']);
+                    $additionalOptions = array();
 
-            $cart->save();
-            Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
+                    $additionalOptions[] = array(
+                        'label' => 'Type cart',
+                        'value' => self::CARTFHTVALUE
+                    );
+
+                    $_product->addCustomOption('additional_options', serialize($additionalOptions));
+                    $cart = Mage::getModel('checkout/cart');
+                    $cart->init();
+                    $params = array(
+                        'product_id' => $item['product_id'],
+                        'qty' => $item['qty']
+                    );
+                    $request = new Varien_Object();
+                    $request->setData($params);
+                    $cart->addProduct($_product, $request);
+                    $cart->save();
+                    Mage::log('afterCreateOrder after save');
+                    Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
+                }
+            }
+            Mage::getSingleton('core/session')->setSessionItemsCart(); //clear session
         }
     }
 
@@ -225,11 +204,18 @@ class Psd2Html_SeparateCart_Model_Observer
      */
     public function addEvent(Varien_Event_Observer $observer)
     {
-//        print $observer->getEvent()->getControllerAction()->getFullActionName();
+//        Mage::log('====' . $observer->getEvent()->getControllerAction()->getFullActionName());
         if ($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepage_index') {
             $event_data_array = array();
             Mage::dispatchEvent('load_checkout_onepage', $event_data_array);
         }
+//        if($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepage_saveOrder'){
+//            //checkout/onepage/success/
+////            checkout_onepage_saveOrder
+////            checkout_onepage_success
+//            $event_data_array = array();
+//            Mage::dispatchEvent('after_checkout_onepage_success', $event_data_array);
+//        }
     }
 
 
