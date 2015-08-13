@@ -55,11 +55,11 @@
 
             <catalog_category_save_after>
                 <observers>
-                    <psd2html_separatecart_model_observer2>
+                    <psd2html_separatecart_catalog_model_observer>
                         <type>model</type>
                         <class>Psd2Html_SeparateCart_Model_Observer</class>
                         <method>addPostData</method>
-                    </psd2html_separatecart_model_observer2>
+                    </psd2html_separatecart_catalog_model_observer>
                 </observers>
             </catalog_category_save_after>
 
@@ -122,6 +122,16 @@
                     </psd2html_separatecart_add_to_cart_after>
                 </observers>
             </checkout_cart_add_product_complete>
+
+            <gone_from_checkout_page>
+                <observers>
+                    <psd2html_separatecart_gone_from_checkout_page>
+                        <type>singleton</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>restoreProductInCart</method>
+                    </psd2html_separatecart_gone_from_checkout_page>
+                </observers>
+            </gone_from_checkout_page>
 
             <!--TEMP-->
             <!--<load_checkout_onepage>-->

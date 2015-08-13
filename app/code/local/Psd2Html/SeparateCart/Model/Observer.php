@@ -11,6 +11,9 @@ class Psd2Html_SeparateCart_Model_Observer
     const CHECKOUT_ACTION = 'checkout_onepage_index';
     const CHECKOUT_ACTION_FHT = 'checkout_onepagefht_index';
 
+    const CHECKOUT_URL_DEFAULT = 'checkout/onepage/index';
+    const CHECKOUT_URL_FHT = 'checkout/onepagefht/index';
+
     private static $status = true;
 
 
@@ -281,6 +284,51 @@ class Psd2Html_SeparateCart_Model_Observer
         }
     }
 
+    public function restoreProductInCart(Varien_Event_Observer $observer)
+    {
+        Mage::log('restoreProductInCart');
+        $typeCart = $observer->getTypecart();
+        Mage::log($observer->getTypecart());
+
+        $items = Mage::getSingleton('core/session')->getSessionItemsCart();
+        if(isset($items) and isset($typeCart)){
+//            Mage::getSingleton('checkout/session')->clear();
+//            Mage::getSingleton('checkout/cart')->truncate();
+            Mage::log('restoreProductInCart add to cart');
+
+            foreach($items as $item) {
+//                Mage::log('Start----------------');
+//                Mage::log($item);
+//                Mage::log('End----------------');
+                if($item['value'] != $typeCart) {
+//                    Zend_Debug::dump($item);
+//                    Mage::log('$typeCart=' . $typeCart);
+//                    Mage::log($item);
+                    $_product = Mage::getModel('catalog/product')->load($item['product_id']);
+
+                    $additionalOptions[] = array(
+                        'label' => 'Type cart',
+                        'value' => $item['value']
+                    );
+
+                    $_product->addCustomOption('additional_options', serialize($additionalOptions));
+                    $cart = Mage::getModel('checkout/cart');
+                    $cart->init();
+                    $params = array(
+                        'product_id' => $item['product_id'],
+                        'qty' => $item['qty']
+                    );
+                    $request = new Varien_Object();
+                    $request->setData($params);
+                    $cart->addProduct($_product, $request);
+                    $cart->save();
+                    Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
+                }
+            }
+            Mage::getSingleton('core/session')->setSessionItemsCart(); //clear session
+        }
+    }
+
     /**
      * Add custom event before load checkout FHT
      * @param $observer
@@ -292,22 +340,34 @@ class Psd2Html_SeparateCart_Model_Observer
         $fullActionName = $observer->getEvent()->getControllerAction()->getFullActionName();
         if ($fullActionName == self::CHECKOUT_ACTION) {
             $event_data_array = array();
-            Mage::dispatchEvent('load_checkout_onepage', $event_data_array);
+            if(!$this->comparePreviousUrl(self::CHECKOUT_URL_DEFAULT)) Mage::dispatchEvent('load_checkout_onepage', $event_data_array);
         }
+
         if ($fullActionName == self::CHECKOUT_ACTION_FHT) {
             $event_data_array = array();
-            Mage::dispatchEvent('load_checkout_onepage_fht', $event_data_array);
+            if(!$this->comparePreviousUrl(self::CHECKOUT_URL_FHT)) Mage::dispatchEvent('load_checkout_onepage_fht', $event_data_array);
         }
-        if($fullActionName != self::CHECKOUT_ACTION AND $fullActionName != self::CHECKOUT_ACTION_FHT) {
 
+        if($fullActionName != self::CHECKOUT_ACTION_FHT && $fullActionName != self::CHECKOUT_ACTION_FHT) {
+            if( $this->comparePreviousUrl(self::CHECKOUT_URL_FHT) ) Mage::dispatchEvent('gone_from_checkout_page', array('typecart' => self::CARTFHTVALUE));
+            elseif ( $this->comparePreviousUrl(self::CHECKOUT_URL_DEFAULT) ) Mage::dispatchEvent('gone_from_checkout_page', array('typecart' => self::CARTDEFAULTVALUE));
         }
-//        if($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepage_saveOrder'){
-//            //checkout/onepage/success/
-////            checkout_onepage_saveOrder
-////            checkout_onepage_success
-//            $event_data_array = array();
-//            Mage::dispatchEvent('after_checkout_onepage_success', $event_data_array);
-//        }
+    }
+
+    /**
+     * Compare url, return true if previous and current url the same
+     * @param $currentUrl
+     * @return bool
+     */
+    private function comparePreviousUrl($currentUrl)
+    {
+        if(isset($_SESSION['core']['last_url'])) {
+            $url = Mage::getSingleton('core/url')->parseUrl($_SESSION['core']['last_url'], null);
+            $path = $url->getPath();
+            if (trim($path, '\/') == $currentUrl) return true;
+            return false;
+        }
+        else return false;
     }
 
 
