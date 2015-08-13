@@ -34,6 +34,20 @@
         </reference>
     </default>
 
+    <!--product page-->
+    <catalog_product_view>
+        <reference name="head">
+            <action method="addItem"><type>skin_js</type><name>js/separatecart.js</name><params/></action>
+        </reference>
+
+        <reference name="content">
+            <reference name="product.info">
+                <block type="catalog/product_view" name="product.info.addtocart" as="addtocart" template="psd2html/separatecart/view/addtocart.phtml"/>
+            </reference>
+        </reference>
+    </catalog_product_view>
+
+    <!--cart page-->
     <checkout_cart_index>
         <reference name="checkout.cart">
             <action method="addItemRender">
@@ -47,23 +61,18 @@
         </reference>
     </checkout_cart_index>
 
-    <catalog_product_view>
-        <reference name="head">
-            <action method="addItem"><type>skin_js</type><name>js/separatecart.js</name><params/></action>
-        </reference>
-    </catalog_product_view>
-
+    <!--FHT cart page-->
     <checkout_fht_index>
         <update handle="checkout_cart_index" />
     </checkout_fht_index>
 
+    <!--FHT checkout page-->
     <checkout_onepagefht_index>
         <update handle="checkout_onepage_index" />
     </checkout_onepagefht_index>
 
     <checkout_onepage_review>
         <reference name="root">
-            <!--<action method="addItemRender"><type>simple</type><block>checkout/cart_item_renderer_configurable</block><template>psd2html/separatecart/checkout/item.phtml</template></action>-->
             <action method="setTemplate"><template>psd2html/separatecart/checkout/onepage/review/info.phtml</template></action>
         </reference>
     </checkout_onepage_review>

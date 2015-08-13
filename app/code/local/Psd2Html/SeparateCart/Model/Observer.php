@@ -8,6 +8,9 @@ class Psd2Html_SeparateCart_Model_Observer
     const CARTFHT = 'checkout_fht_index';
     const CARTFHTVALUE = 'fht';
 
+    const CHECKOUT_ACTION = 'checkout_onepage_index';
+    const CHECKOUT_ACTION_FHT = 'checkout_onepagefht_index';
+
     private static $status = true;
 
 
@@ -267,6 +270,17 @@ class Psd2Html_SeparateCart_Model_Observer
         }
     }
 
+    public function changeRedirectCartUrlFHT(Varien_Event_Observer $observer)
+    {
+        Mage::log('changeRedirectCartUrlFHT');
+        $params = $observer->getRequest()->getParams();
+        if(isset($params) && $params['typecart'] == self::CARTFHTVALUE){
+            Mage::app()->getFrontController()->getResponse()->setRedirect(Mage::getUrl('checkout/fht'));
+            Mage::app()->getResponse()->sendResponse();
+            exit;
+        }
+    }
+
     /**
      * Add custom event before load checkout FHT
      * @param $observer
@@ -275,13 +289,17 @@ class Psd2Html_SeparateCart_Model_Observer
     public function addEvent(Varien_Event_Observer $observer)
     {
 //        Mage::log('====' . $observer->getEvent()->getControllerAction()->getFullActionName());
-        if ($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepage_index') {
+        $fullActionName = $observer->getEvent()->getControllerAction()->getFullActionName();
+        if ($fullActionName == self::CHECKOUT_ACTION) {
             $event_data_array = array();
             Mage::dispatchEvent('load_checkout_onepage', $event_data_array);
         }
-        if ($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepagefht_index') {
+        if ($fullActionName == self::CHECKOUT_ACTION_FHT) {
             $event_data_array = array();
             Mage::dispatchEvent('load_checkout_onepage_fht', $event_data_array);
+        }
+        if($fullActionName != self::CHECKOUT_ACTION AND $fullActionName != self::CHECKOUT_ACTION_FHT) {
+
         }
 //        if($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_onepage_saveOrder'){
 //            //checkout/onepage/success/

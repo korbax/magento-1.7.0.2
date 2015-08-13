@@ -103,6 +103,16 @@
                 </observers>
             </load_checkout_onepage_fht>
 
+            <checkout_cart_add_product_complete>
+                <observers>
+                    <psd2html_separatecart_add_to_cart_after>
+                        <type>singleton</type>
+                        <class>Psd2Html_SeparateCart_Model_Observer</class>
+                        <method>changeRedirectCartUrlFHT</method>
+                    </psd2html_separatecart_add_to_cart_after>
+                </observers>
+            </checkout_cart_add_product_complete>
+
             <!--TEMP-->
             <!--<load_checkout_onepage>-->
                 <!--<observers>-->
